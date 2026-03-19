@@ -1,0 +1,21 @@
+<svg width="100%" viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Icon: stacked arcs -->
+  <g transform="translate(90, 100)" style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+    <path d="M-30,22 A38,38 0 0,1 30,22" fill="none" stroke="#D85A30" stroke-width="8" stroke-linecap="round" style="fill:none;stroke:rgb(216, 90, 48);color:rgb(255, 255, 255);stroke-width:8px;stroke-linecap:round;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+    <path d="M-18,10 A24,24 0 0,1 18,10" fill="none" stroke="#7F77DD" stroke-width="8" stroke-linecap="round" style="fill:none;stroke:rgb(127, 119, 221);color:rgb(255, 255, 255);stroke-width:8px;stroke-linecap:round;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+    <path d="M-8,1 A12,12 0 0,1 8,1" fill="none" stroke="#1D9E75" stroke-width="8" stroke-linecap="round" style="fill:none;stroke:rgb(29, 158, 117);color:rgb(255, 255, 255);stroke-width:8px;stroke-linecap:round;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+    <circle cx="0" cy="22" r="6" fill="#D85A30" style="fill:rgb(216, 90, 48);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="148" y="112" font-family="var(--font-sans)" font-size="48" font-weight="500" fill="var(--color-text-primary)" letter-spacing="-1" style="fill:rgb(250, 249, 245);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, sans-serif;font-size:48px;font-weight:500;text-anchor:start;dominant-baseline:auto">Acordio</text>
+
+  <!-- Tagline -->
+  <text x="150" y="138" font-family="var(--font-sans)" font-size="12" fill="var(--color-text-secondary)" letter-spacing="2.5" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, sans-serif;font-size:12px;font-weight:400;text-anchor:start;dominant-baseline:auto">FREELANCE PIPELINE</text>
+</svg>

@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Status {
+  LEAD
+  ACTIVE
+  INACTIVE
+}
+
+model Client {
+  id        String    @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  status    Status    @default(LEAD)
+  notes     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  projects  Project[]
+}
+
+enum ProjectType {
+  PROJECT
+  SUPPORT
+  RETAINER
+}
+
+model Project {
+  id          String      @id @default(cuid())
+  clientId    String
+  client      Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  name        String
+  type        ProjectType @default(PROJECT)
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  tasks       Task[]
+  agreements  Agreement[]
+}
+
+model Task {
+  id             String   @id @default(cuid())
+  projectId      String
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?
+  price          Float?
+  estimatedHours Float?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Agreement {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  content     String
+  generatedAt DateTime @default(now())
+}
