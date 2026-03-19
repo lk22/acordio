@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getIronSession } from 'iron-session';
-import {SessionData, sessionOptions} from '@/lib/session';
+import { SessionData } from '@/lib/session';
 
 export async function proxy(request: NextRequest) {
   const response = NextResponse.next();
