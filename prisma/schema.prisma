@@ -54,6 +54,7 @@ model Project {
   updatedAt   DateTime    @updatedAt
   tasks       Task[]
   agreements  Agreement[]
+  proposals   Proposal[]
 }
 
 model Task {
@@ -74,4 +75,20 @@ model Agreement {
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   content     String
   generatedAt DateTime @default(now())
+}
+
+enum ProposalStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+}
+
+model Proposal {
+  id          String         @id @default(cuid())
+  projectId   String
+  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  content     String
+  status      ProposalStatus @default(DRAFT)
+  generatedAt DateTime       @default(now())
 }

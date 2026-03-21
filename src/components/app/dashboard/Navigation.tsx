@@ -17,7 +17,6 @@ export default function Navigation() {
             Projects
           </Link>
         </li>
-        {/* Add more navigation items here */}
       </ul>
     </nav>
   );

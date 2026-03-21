@@ -2,35 +2,8 @@ import {NextResponse, NextRequest} from "next/server";
 
 import {prisma} from "@/lib/prisma";
 
-function fetchSingleClient(id: string) {
-  return prisma.client.findUnique({
-    where: { id }
-  });
-}
-
-function fetchAllClients() {
-  return prisma.client.findMany();
-}
-
 export async function GET(request: NextRequest) {
-  if ( request.nextUrl.searchParams.get("id") ) {
-    const id = request.nextUrl.searchParams.get("id") as string;
-    const client = await fetchSingleClient(id);
-
-    if ( ! client ) {
-      return NextResponse.json({
-        message: "Client not found",
-        success: false
-      });
-    }
-
-    return NextResponse.json({
-      message: "Client found",
-      client,
-      success: true
-    });
-  } else {
-    const clients = await fetchAllClients();
+    const clients = await prisma.client.findMany();
 
     if ( ! clients ) {
       return NextResponse.json({
@@ -43,7 +16,6 @@ export async function GET(request: NextRequest) {
       message: `Found ${clients.length} clients`,
       clients,
     }, { status: 200 });
-  }
 }
 
 export async function POST(request: NextRequest) {
