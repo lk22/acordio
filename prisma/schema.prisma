@@ -5,16 +5,20 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
+  // output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = "postgresql://root:root@localhost:5432/acordio"
 }
 
 enum Status {
   LEAD
+  CUSTOMER
+  HAS_RECEIVED_PROPOSAL
+  HAS_SIGNED_AGREEMENT
   ACTIVE
   INACTIVE
 }
@@ -24,6 +28,8 @@ model Client {
   name      String
   email     String?
   phone     String?
+  address   String?
+  company   String?
   status    Status    @default(LEAD)
   notes     String?
   createdAt DateTime  @default(now())

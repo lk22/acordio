@@ -1,10 +1,16 @@
 import {NextRequest, NextResponse} from "next/server";
 import {getSession} from "@/lib/session";
 
+export async function GET() {
+  return NextResponse.json({
+    "ok": true
+  });
+}
+
 export async function POST(request: NextRequest) {
   const {username, password} = await request.json();
 
-  const validUsername = username === process.env.APP_username;
+  const validUsername = username === process.env.APP_USERNAME;
   const validPassword = password === process.env.APP_PASSWORD;
 
   if (!validUsername || !validPassword) {

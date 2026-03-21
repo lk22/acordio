@@ -3,10 +3,15 @@
 // npm install --save-dev prisma dotenv
 import "dotenv/config";
 import { defineConfig, env } from "prisma/config";
+import * as dotenv from "dotenv";
+
+dotenv.config({ path: ".env" });
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
-  migrate: {
+  migrations: {
+    path: "prisma/migrations",
+    seed: "npx tsx prisma/seed.ts",
     async adapter() {
       if (process.env.NODE_ENV === "production") {
         const { PrismaNeon } = await import("@prisma/adapter-neon");
@@ -19,13 +24,10 @@ export default defineConfig({
         const pool = new Pool({ connectionString: process.env.DATABASE_URL });
         return new PrismaPg(pool);
       }
-    }
-  },
-  migrations: {
-    path: "prisma/migrations",
+    },
   },
   engine: "classic",
   datasource: {
-    url: env("DATABASE_URL"),
+    url: process.env.DATABASE_URL || "postgresql://root:root@localhost:5432/acordio",
   },
 });
