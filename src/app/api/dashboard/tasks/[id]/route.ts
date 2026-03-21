@@ -8,32 +8,21 @@ export async function GET(
 ) {
   const { id } = await params;
 
-  const project = await prisma.project.findUnique({
+  const task = await prisma.task.findUnique({
     where: { id },
     include: {
-      client: true,
-      tasks: {
-        orderBy: {
-          createdAt: "desc",
-        },
-      },
-      agreements: {
-        orderBy: {
-          generatedAt: "desc",
-        },
-      },
-      proposals: {
-        orderBy: {
-          generatedAt: "desc",
+      project: {
+        include: {
+          client: true,
         },
       },
     },
   });
 
-  if (!project) {
+  if (!task) {
     return NextResponse.json(
       {
-        message: "Project not found",
+        message: "Task not found",
         success: false,
       },
       { status: 404 }
@@ -42,8 +31,8 @@ export async function GET(
 
   return NextResponse.json(
     {
-      message: "Project found",
-      project,
+      message: "Task found",
+      task,
       success: true,
     },
     { status: 200 }
@@ -55,25 +44,30 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const { name, type, description } = await request.json();
+  const { title, description, price, estimatedHours } = await request.json();
 
-  const updatedProject = await prisma.project.update({
+  const updatedTask = await prisma.task.update({
     where: { id },
     data: {
-      name,
-      type,
+      title,
       description,
+      price: price !== undefined ? (price ? parseFloat(price) : null) : undefined,
+      estimatedHours:
+        estimatedHours !== undefined
+          ? estimatedHours
+            ? parseFloat(estimatedHours)
+            : null
+          : undefined,
     },
     include: {
-      client: true,
-      tasks: true,
+      project: true,
     },
   });
 
-  if (!updatedProject) {
+  if (!updatedTask) {
     return NextResponse.json(
       {
-        message: "Failed to update project",
+        message: "Failed to update task",
         success: false,
       },
       { status: 500 }
@@ -82,8 +76,8 @@ export async function PUT(
 
   return NextResponse.json(
     {
-      message: "Project updated successfully",
-      project: updatedProject,
+      message: "Task updated successfully",
+      task: updatedTask,
       success: true,
     },
     { status: 200 }
@@ -96,14 +90,14 @@ export async function DELETE(
 ) {
   const { id } = await params;
 
-  const deletedProject = await prisma.project.delete({
+  const deletedTask = await prisma.task.delete({
     where: { id },
   });
 
-  if (!deletedProject) {
+  if (!deletedTask) {
     return NextResponse.json(
       {
-        message: "Failed to delete project",
+        message: "Failed to delete task",
         success: false,
       },
       { status: 500 }
@@ -112,7 +106,7 @@ export async function DELETE(
 
   return NextResponse.json(
     {
-      message: "Project deleted successfully",
+      message: "Task deleted successfully",
       success: true,
     },
     { status: 200 }

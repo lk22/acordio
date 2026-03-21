@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    "src/generated/**",
+    "prisma.config_bak.ts",
   ]),
   // allow require() in .ts files
   {
