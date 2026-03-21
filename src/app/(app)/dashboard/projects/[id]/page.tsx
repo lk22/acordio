@@ -1,6 +1,8 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import { AgreementDocument } from '@/components/app/agreements/AgreementDocument';
 
 interface Task {
   id: string;
@@ -21,6 +23,8 @@ interface Project {
     name: string;
     email?: string;
     phone?: string;
+    address?: string;
+    company?: string;
   };
   tasks: Task[];
   createdAt: string;
@@ -42,7 +46,9 @@ export default function ProjectDetailPage({
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [showTaskForm, setShowTaskForm] = useState(false);
+  const [showAgreementForm, setShowAgreementForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [agreementType, setAgreementType] = useState<string>('PROJECT');
   const [taskFormData, setTaskFormData] = useState<TaskFormData>({
     title: '',
     description: '',
@@ -163,6 +169,32 @@ export default function ProjectDetailPage({
     return (
       project?.tasks.reduce((sum, t) => sum + (t.estimatedHours || 0), 0) || 0
     );
+  }
+
+  async function handleGenerateAgreement() {
+    if (!project || project.tasks.length === 0) {
+      alert('Du skal have opgaver i projektet for at generere en aftale.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/dashboard/agreements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId: project.id,
+          type: agreementType,
+          content: 'Genereret fra Acordio',
+        }),
+      });
+
+      if (res.ok) {
+        setShowAgreementForm(false);
+        alert('Aftale genereret!');
+      }
+    } catch (error) {
+      console.error('Error generating agreement:', error);
+    }
   }
 
   if (loading) {
@@ -385,6 +417,89 @@ export default function ProjectDetailPage({
           </div>
         )}
       </div>
+
+      <div className="border-t pt-6 mt-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Aftaler</h2>
+          <button
+            onClick={() => setShowAgreementForm(true)}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            + Generer aftale
+          </button>
+        </div>
+
+        {showAgreementForm && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg w-full max-w-md">
+              <h3 className="text-lg font-bold mb-4">Generer aftale</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Aftaltype
+                  </label>
+                  <select
+                    value={agreementType}
+                    onChange={(e) => setAgreementType(e.target.value)}
+                    className="w-full px-3 py-2 border rounded"
+                  >
+                    <option value="PROJECT">Projekt</option>
+                    <option value="SUPPORT">Support</option>
+                    <option value="RETAINER">Retainer</option>
+                  </select>
+                </div>
+                <div className="bg-gray-50 p-4 rounded">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Oversigt over aftalen:
+                  </p>
+                  <p className="font-semibold">
+                    {getTotalPrice().toLocaleString('da-DK')} kr.
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {getTotalHours()} timer • {project.tasks.length} opgaver
+                  </p>
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowAgreementForm(false)}
+                    className="px-4 py-2 border rounded hover:bg-gray-100"
+                  >
+                    Annuller
+                  </button>
+                  <button
+                    onClick={handleGenerateAgreement}
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                  >
+                    Generer aftale
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {project.tasks.length > 0 && (
+        <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+          <h3 className="font-semibold mb-2">Download aftale som PDF</h3>
+          <PDFDownloadLink
+            document={
+              <AgreementDocument
+                project={project}
+                agreementType={agreementType}
+                generatedDate={new Date().toLocaleDateString('da-DK')}
+              />
+            }
+            fileName={`aftale-${project.name.toLowerCase().replace(/\s+/g, '-')}.pdf`}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 inline-block"
+          >
+            {({ loading }) =>
+              loading ? 'Forbereder PDF...' : 'Download PDF'
+            }
+          </PDFDownloadLink>
+        </div>
+      )}
     </div>
   );
 }

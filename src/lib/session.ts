@@ -8,12 +8,12 @@ export interface SessionData {
 }
 
 export async function getSession() {
-  return getIronSession(await cookies(), {
+  return getIronSession<SessionData>(await cookies(), {
     password: process.env.SESSION_SECRET as string,
     cookieName: "acordio_session",
     cookieOptions: {
       secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 30, // 30 dage
+      maxAge: 60 * 60 * 24 * 30,
     },
   });
 }

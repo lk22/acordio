@@ -23,14 +23,14 @@ async function main() {
       {
         name: "Test Projekt",
         description: "Dette er et test projekt",
-        status: "PLANNING",
-        clientId: "1", // Assuming this is the ID of the first client created above
+        type: "PROJECT",
+        clientId: "1",
       },
       {
         name: "Aktivt Projekt",
         description: "Dette er et aktivt projekt",
-        status: "ACTIVE",
-        clientId: "2", // Assuming this is the ID of the second client created above
+        type: "SUPPORT",
+        clientId: "2",
       }
     ],
   });

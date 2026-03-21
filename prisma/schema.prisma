@@ -70,11 +70,18 @@ model Task {
 }
 
 model Agreement {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
+  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId   String
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type        AgreementType @default(PROJECT)
   content     String
-  generatedAt DateTime @default(now())
+  generatedAt DateTime       @default(now())
+}
+
+enum AgreementType {
+  PROJECT
+  SUPPORT
+  RETAINER
 }
 
 enum ProposalStatus {
