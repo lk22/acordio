@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { NEXT_PUBLIC_BASE_URL } from '@/app/constants';
-import Link from 'next/link';
 
 export default async function Page() {
   const response = await fetch(`${NEXT_PUBLIC_BASE_URL}/api/dashboard/projects`);

@@ -15,7 +15,6 @@ export default function Header() {
     <header className="w-full h-16 text-white flex items-center justify-between px-4 border-b border-b-gray-300">
       <Logo width={250} />
       <Navigation />
-
     </header>
   );
 }
