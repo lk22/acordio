@@ -175,7 +175,7 @@ export default function ClientDetailPage({
     }
   }
 
-  async function handleCreateActivityLog(e: React.FormEvent) {
+  async function handleCreateActivityLog(e: React.SubmitEvent) {
     e.preventDefault();
     if (!clientId) return;
 
@@ -219,7 +219,7 @@ export default function ClientDetailPage({
   }
 
   return (
-    <div className="space-y-6 w-7xl max-w-7xl">
+    <div className="space-y-6 xs:max-w-full sm:max-w-full md:max-w-full lg:max-w-full xl:max-w-7xl xs:w-full sm:w-full md:w-full lg:w-full xl:w-7xl">
       <div>
         <Button variant="ghost" size="sm" asChild className="mb-2 -ml-2">
           <Link href="/dashboard/clients">

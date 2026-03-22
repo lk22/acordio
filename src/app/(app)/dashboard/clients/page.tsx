@@ -187,7 +187,7 @@ export default function ClientsPage() {
     : clients.filter(c => c.status === statusFilter);
 
   return (
-    <div className="space-y-6 max-w-7xl w-7xl">
+    <div className="space-y-6 xs:max-w-full sm:max-w-full md:max-w-full lg:max-w-full xl:max-w-7xl xs:w-full sm:w-full md:w-full lg:w-full xl:w-7xl">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Kunder & Leads</h1>
