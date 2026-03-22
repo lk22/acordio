@@ -3,34 +3,30 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
 
-  const client = await prisma.client.findUnique({
+  const timeEntry = await prisma.timeEntry.findUnique({
     where: { id },
     include: {
-      projects: {
+      task: {
         include: {
-          tasks: true,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      },
-      activityLogs: {
-        orderBy: {
-          createdAt: "desc",
+          project: {
+            include: {
+              client: true,
+            },
+          },
         },
       },
     },
   });
 
-  if (!client) {
+  if (!timeEntry) {
     return NextResponse.json(
       {
-        message: "Client not found",
+        message: "Time entry not found",
         success: false,
       },
       { status: 404 }
@@ -39,8 +35,8 @@ export async function GET(
 
   return NextResponse.json(
     {
-      message: "Client found",
-      client,
+      message: "Time entry found",
+      timeEntry,
       success: true,
     },
     { status: 200 }
@@ -52,26 +48,32 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const { name, email, phone, address, company, status, notes } =
-    await request.json();
+  const { hours, date, notes } = await request.json();
 
-  const updatedClient = await prisma.client.update({
+  const updatedTimeEntry = await prisma.timeEntry.update({
     where: { id },
     data: {
-      name,
-      email,
-      phone,
-      address,
-      company,
-      status,
+      hours,
+      date,
       notes,
+    },
+    include: {
+      task: {
+        include: {
+          project: {
+            include: {
+              client: true,
+            },
+          },
+        },
+      },
     },
   });
 
-  if (!updatedClient) {
+  if (!updatedTimeEntry) {
     return NextResponse.json(
       {
-        message: "Failed to update client",
+        message: "Failed to update time entry",
         success: false,
       },
       { status: 500 }
@@ -80,8 +82,8 @@ export async function PUT(
 
   return NextResponse.json(
     {
-      message: "Client updated successfully",
-      client: updatedClient,
+      message: "Time entry updated successfully",
+      timeEntry: updatedTimeEntry,
       success: true,
     },
     { status: 200 }
@@ -89,19 +91,19 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
 
-  const deletedClient = await prisma.client.delete({
+  const deletedTimeEntry = await prisma.timeEntry.delete({
     where: { id },
   });
 
-  if (!deletedClient) {
+  if (!deletedTimeEntry) {
     return NextResponse.json(
       {
-        message: "Failed to delete client",
+        message: "Failed to delete time entry",
         success: false,
       },
       { status: 500 }
@@ -110,7 +112,7 @@ export async function DELETE(
 
   return NextResponse.json(
     {
-      message: "Client deleted successfully",
+      message: "Time entry deleted successfully",
       success: true,
     },
     { status: 200 }

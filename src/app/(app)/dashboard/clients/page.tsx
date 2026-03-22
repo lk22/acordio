@@ -1,6 +1,16 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UserPlus, Mail, Phone, MapPin, Building2, FileText, ChevronRight, Pencil, Trash2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface Client {
   id: string;
@@ -25,13 +35,13 @@ interface ClientFormData {
   notes: string;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  LEAD: 'bg-yellow-100 text-yellow-700',
-  CUSTOMER: 'bg-blue-100 text-blue-700',
-  HAS_RECEIVED_PROPOSAL: 'bg-purple-100 text-purple-700',
-  HAS_SIGNED_AGREEMENT: 'bg-green-100 text-green-700',
-  ACTIVE: 'bg-green-100 text-green-700',
-  INACTIVE: 'bg-gray-100 text-gray-600',
+const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' }> = {
+  LEAD: { label: 'Lead', variant: 'default' },
+  CUSTOMER: { label: 'Kunde', variant: 'default' },
+  HAS_RECEIVED_PROPOSAL: { label: 'Har tilbud', variant: 'secondary' },
+  HAS_SIGNED_AGREEMENT: { label: 'Har aftale', variant: 'default' },
+  ACTIVE: { label: 'Aktiv', variant: 'default' },
+  INACTIVE: { label: 'Inaktiv', variant: 'outline' },
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -169,7 +179,7 @@ export default function ClientsPage() {
   }
 
   if (loading) {
-    return <div className="p-8">Indlæser...</div>;
+    return <div className="text-center text-muted-foreground py-12">Indlæser...</div>;
   }
 
   const filteredClients = statusFilter === 'ALL'
@@ -177,226 +187,234 @@ export default function ClientsPage() {
     : clients.filter(c => c.status === statusFilter);
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
+    <div className="space-y-6 max-w-7xl w-7xl">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">Kunder & Leads</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold tracking-tight">Kunder & Leads</h1>
+          <p className="text-muted-foreground mt-1">
             {filteredClients.length} af {clients.length} kunder
           </p>
         </div>
-        <button
-          onClick={openCreateForm}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          + Nyt lead
-        </button>
+        <Button onClick={openCreateForm}>
+          <UserPlus className="h-4 w-4 mr-2" />
+          Nyt lead
+        </Button>
       </div>
 
-      {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto">
-          <div className="bg-white p-6 rounded-lg w-full max-w-lg my-8">
-            <h2 className="text-xl font-bold mb-4">
-              {editingClient ? 'Rediger kunde' : 'Nyt lead'}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Navn</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border rounded"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Firma</label>
-                  <input
-                    type="text"
-                    value={formData.company}
-                    onChange={(e) =>
-                      setFormData({ ...formData, company: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border rounded"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Email</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border rounded"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Telefon</label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                    className="w-full px-3 py-2 border rounded"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Adresse</label>
-                <input
-                  type="text"
-                  value={formData.address}
-                  onChange={(e) =>
-                    setFormData({ ...formData, address: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Status</label>
-                <select
-                  value={formData.status}
-                  onChange={(e) =>
-                    setFormData({ ...formData, status: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border rounded"
-                >
-                  <option value="LEAD">Lead</option>
-                  <option value="CUSTOMER">Kunde</option>
-                  <option value="HAS_RECEIVED_PROPOSAL">Har modtaget tilbud</option>
-                  <option value="HAS_SIGNED_AGREEMENT">Har underskrevet aftale</option>
-                  <option value="ACTIVE">Aktiv</option>
-                  <option value="INACTIVE">Inaktiv</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Noter</label>
-                <textarea
-                  value={formData.notes}
-                  onChange={(e) =>
-                    setFormData({ ...formData, notes: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border rounded"
-                  rows={3}
-                  placeholder="Indledende noter om kunden..."
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <button
-                  type="button"
-                  onClick={closeForm}
-                  className="px-4 py-2 border rounded hover:bg-gray-100"
-                >
-                  Annuller
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  {editingClient ? 'Gem' : 'Opret'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      <div className="flex gap-2 mb-6 flex-wrap">
+      <div className="flex gap-2 flex-wrap">
         {Object.entries(STATUS_LABELS).map(([key, label]) => (
-          <button
+          <Button
             key={key}
+            variant={statusFilter === key ? 'default' : 'outline'}
+            size="sm"
             onClick={() => setStatusFilter(key)}
-            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
-              statusFilter === key
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
           >
             {label}
             {key !== 'ALL' && (
-              <span className="ml-1.5 text-xs opacity-75">
-                ({clients.filter(c => key === 'ALL' || c.status === key).length})
-              </span>
+              <Badge variant="secondary" className="ml-2">
+                {clients.filter(c => key === 'ALL' || c.status === key).length}
+              </Badge>
             )}
-          </button>
+          </Button>
         ))}
       </div>
 
       {filteredClients.length === 0 ? (
-        <p className="text-gray-500">Ingen kunder i denne kategori.</p>
+        <Card>
+          <CardContent className="py-12 text-center text-muted-foreground">
+            Ingen kunder i denne kategori
+          </CardContent>
+        </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="grid gap-4">
           {filteredClients.map((client) => (
-            <div
-              key={client.id}
-              className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <Link
-                    href={`/dashboard/clients/${client.id}`}
-                    className="text-lg font-semibold hover:underline"
-                  >
-                    {client.name}
-                  </Link>
-                  {client.company && (
-                    <p className="text-sm text-gray-500">{client.company}</p>
-                  )}
-                  <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-600">
-                    {client.email && <span>{client.email}</span>}
-                    {client.phone && <span>{client.phone}</span>}
+            <Card key={client.id} className="hover:bg-accent/50 transition-colors">
+              <CardContent className="p-6">
+                <div className="flex justify-between items-start">
+                  <div className="space-y-1">
+                    <Link
+                      href={`/dashboard/clients/${client.id}`}
+                      className="text-lg font-semibold hover:underline inline-flex items-center gap-1"
+                    >
+                      {client.name}
+                      <ChevronRight className="h-4 w-4" />
+                    </Link>
+                    {client.company && (
+                      <p className="text-sm text-muted-foreground flex items-center gap-1">
+                        <Building2 className="h-3 w-3" />
+                        {client.company}
+                      </p>
+                    )}
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-muted-foreground">
+                      {client.email && (
+                        <span className="inline-flex items-center gap-1">
+                          <Mail className="h-3 w-3" />
+                          {client.email}
+                        </span>
+                      )}
+                      {client.phone && (
+                        <span className="inline-flex items-center gap-1">
+                          <Phone className="h-3 w-3" />
+                          {client.phone}
+                        </span>
+                      )}
+                      {client.address && (
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {client.address}
+                        </span>
+                      )}
+                    </div>
+                    {client.notes && (
+                      <p className="text-sm text-muted-foreground mt-2 line-clamp-2 flex items-start gap-1">
+                        <FileText className="h-3 w-3 mt-0.5 shrink-0" />
+                        {client.notes}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Select
+                      value={client.status}
+                      onValueChange={(value) => handleStatusChange(client.id, value)}
+                    >
+                      <SelectTrigger className={cn(
+                        "w-[160px]",
+                        client.status === 'LEAD' && "border-yellow-500 bg-yellow-50",
+                        client.status === 'CUSTOMER' && "border-blue-500 bg-blue-50",
+                        client.status === 'ACTIVE' && "border-green-500 bg-green-50",
+                        client.status === 'INACTIVE' && "border-gray-500 bg-gray-50",
+                      )}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(STATUS_CONFIG).map(([key, config]) => (
+                          <SelectItem key={key} value={key}>
+                            {config.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-                <select
-                  value={client.status}
-                  onChange={(e) => handleStatusChange(client.id, e.target.value)}
-                  className={`px-3 py-1 rounded text-sm font-medium border-0 ${STATUS_COLORS[client.status] || 'bg-gray-100'}`}
-                >
-                  <option value="LEAD">Lead</option>
-                  <option value="CUSTOMER">Kunde</option>
-                  <option value="HAS_RECEIVED_PROPOSAL">Har modtaget tilbud</option>
-                  <option value="HAS_SIGNED_AGREEMENT">Har underskrevet aftale</option>
-                  <option value="ACTIVE">Aktiv</option>
-                  <option value="INACTIVE">Inaktiv</option>
-                </select>
-              </div>
-              {client.notes && (
-                <p className="mt-2 text-sm text-gray-500 line-clamp-2">
-                  {client.notes}
-                </p>
-              )}
-              <div className="mt-3 flex gap-2">
-                <Link
-                  href={`/dashboard/clients/${client.id}`}
-                  className="px-3 py-1 text-sm border rounded hover:bg-gray-100"
-                >
-                  Se detaljer
-                </Link>
-                <button
-                  onClick={() => openEditForm(client)}
-                  className="px-3 py-1 text-sm border rounded hover:bg-gray-100"
-                >
-                  Rediger
-                </button>
-                <button
-                  onClick={() => handleDelete(client.id)}
-                  className="px-3 py-1 text-sm border border-red-300 text-red-600 rounded hover:bg-red-50"
-                >
-                  Slet
-                </button>
-              </div>
-            </div>
+                <div className="flex gap-2 mt-4">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/dashboard/clients/${client.id}`}>
+                      Se detaljer
+                    </Link>
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => openEditForm(client)}>
+                    <Pencil className="h-4 w-4 mr-1" />
+                    Rediger
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-destructive hover:text-destructive"
+                    onClick={() => handleDelete(client.id)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Slet
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
+
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>
+              {editingClient ? 'Rediger kunde' : 'Nyt lead'}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Navn</Label>
+                <Input
+                  id="name"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="company">Firma</Label>
+                <Input
+                  id="company"
+                  value={formData.company}
+                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Telefon</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="address">Adresse</Label>
+              <Input
+                id="address"
+                value={formData.address}
+                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => setFormData({ ...formData, status: value })}
+              >
+                <SelectTrigger id="status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(STATUS_CONFIG).map(([key, config]) => (
+                    <SelectItem key={key} value={key}>
+                      {config.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="notes">Noter</Label>
+              <Textarea
+                id="notes"
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                placeholder="Indledende noter om kunden..."
+              />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={closeForm}>
+                Annuller
+              </Button>
+              <Button type="submit">
+                {editingClient ? 'Gem ændringer' : 'Opret'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

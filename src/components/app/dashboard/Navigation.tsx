@@ -2,20 +2,22 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { LayoutDashboard, Users, FolderKanban } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type NavigationItem = {
   href: string;
   label: string;
-  icon: string;
+  icon: React.ElementType;
 }
 
 export default function Navigation() {
   const pathname = usePathname();
 
   const navItems: NavigationItem[] = [
-    { href: '/dashboard', label: 'Dashboard', icon: '◉' },
-    { href: '/dashboard/clients', label: 'Kunder', icon: '○' },
-    { href: '/dashboard/projects', label: 'Projekter', icon: '□' },
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/dashboard/clients', label: 'Kunder', icon: Users },
+    { href: '/dashboard/projects', label: 'Projekter', icon: FolderKanban },
   ];
 
   return (
@@ -30,12 +32,14 @@ export default function Navigation() {
             <li key={item.href}>
               <Link
                 href={item.href}
-                className={`px-3 py-1.5 rounded text-sm transition-colors ${
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors",
                   isActive
-                    ? 'bg-blue-100 text-blue-700 font-medium'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
+                    ? 'bg-secondary text-secondary-foreground font-medium'
+                    : 'text-muted-foreground hover:bg-secondary hover:text-secondary-foreground'
+                )}
               >
+                <item.icon className="h-4 w-4" />
                 {item.label}
               </Link>
             </li>

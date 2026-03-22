@@ -1,6 +1,15 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus, FolderKanban, ChevronRight, Pencil, Trash2, DollarSign, Clock, User } from 'lucide-react';
 
 interface Client {
   id: string;
@@ -32,6 +41,12 @@ interface ProjectFormData {
   type: string;
   description: string;
 }
+
+const PROJECT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
+  PROJECT: { label: 'Projekt', color: 'bg-blue-100 text-blue-800' },
+  SUPPORT: { label: 'Support', color: 'bg-green-100 text-green-800' },
+  RETAINER: { label: 'Retainer', color: 'bg-purple-100 text-purple-800' },
+};
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -152,180 +167,175 @@ export default function ProjectsPage() {
   }
 
   if (loading) {
-    return <div className="p-8">Indlæser...</div>;
+    return <div className="text-center text-muted-foreground py-12">Indlæser...</div>;
   }
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Projekter</h1>
-        <button
-          onClick={openCreateForm}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          + Nyt projekt
-        </button>
+    <div className="space-y-6 w-7xl">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Projekter</h1>
+          <p className="text-muted-foreground mt-1">
+            {projects.length} projekt{projects.length !== 1 ? 'er' : ''}
+          </p>
+        </div>
+        <Button onClick={openCreateForm}>
+          <Plus className="h-4 w-4 mr-2" />
+          Nyt projekt
+        </Button>
       </div>
 
-      {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">
-              {editingProject ? 'Rediger projekt' : 'Nyt projekt'}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Navn</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Kunde</label>
-                <select
-                  required
-                  value={formData.clientId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, clientId: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border rounded"
-                >
-                  <option value="">Vælg kunde...</option>
-                  {clients.map((client) => (
-                    <option key={client.id} value={client.id}>
-                      {client.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Type</label>
-                <select
-                  value={formData.type}
-                  onChange={(e) =>
-                    setFormData({ ...formData, type: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border rounded"
-                >
-                  <option value="PROJECT">Projekt</option>
-                  <option value="SUPPORT">Support</option>
-                  <option value="RETAINER">Retainer</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Beskrivelse
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border rounded"
-                  rows={3}
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <button
-                  type="button"
-                  onClick={closeForm}
-                  className="px-4 py-2 border rounded hover:bg-gray-100"
-                >
-                  Annuller
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                  {editingProject ? 'Gem' : 'Opret'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
       {projects.length === 0 ? (
-        <p className="text-gray-500">Ingen projekter endnu.</p>
+        <Card>
+          <CardContent className="py-12 text-center">
+            <FolderKanban className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <p className="text-muted-foreground">Ingen projekter endnu</p>
+            <Button variant="outline" className="mt-4" onClick={openCreateForm}>
+              <Plus className="h-4 w-4 mr-2" />
+              Opret dit første projekt
+            </Button>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="grid gap-4">
           {projects.map((project) => (
-            <div
-              key={project.id}
-              className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <Link
-                    href={`/dashboard/projects/${project.id}`}
-                    className="text-lg font-semibold hover:underline"
-                  >
-                    {project.name}
-                  </Link>
-                  <p className="text-sm text-gray-500">
-                    {project.client.name} &bull;{' '}
-                    <span
-                      className={`inline-block px-2 py-0.5 rounded text-xs ${
-                        project.type === 'PROJECT'
-                          ? 'bg-blue-100 text-blue-700'
-                          : project.type === 'SUPPORT'
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-purple-100 text-purple-700'
-                      }`}
+            <Card key={project.id} className="hover:bg-accent/50 transition-colors">
+              <CardContent className="p-6">
+                <div className="flex justify-between items-start">
+                  <div className="space-y-1">
+                    <Link
+                      href={`/dashboard/projects/${project.id}`}
+                      className="text-lg font-semibold hover:underline inline-flex items-center gap-1"
                     >
-                      {project.type === 'PROJECT'
-                        ? 'Projekt'
-                        : project.type === 'SUPPORT'
-                        ? 'Support'
-                        : 'Retainer'}
-                    </span>
-                  </p>
-                  {project.description && (
-                    <p className="mt-2 text-gray-600">{project.description}</p>
-                  )}
+                      {project.name}
+                      <ChevronRight className="h-4 w-4" />
+                    </Link>
+                    <div className="flex items-center gap-4 mt-2">
+                      <span className="text-sm text-muted-foreground inline-flex items-center gap-1">
+                        <User className="h-3 w-3" />
+                        {project.client.name}
+                      </span>
+                      <Badge className={PROJECT_TYPE_CONFIG[project.type]?.color}>
+                        {PROJECT_TYPE_CONFIG[project.type]?.label}
+                      </Badge>
+                    </div>
+                    {project.description && (
+                      <p className="text-sm text-muted-foreground mt-2">
+                        {project.description}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right space-y-1">
+                    <p className="font-semibold flex items-center gap-1 justify-end">
+                      <DollarSign className="h-4 w-4" />
+                      {getProjectTotal(project).toLocaleString('da-DK')} kr.
+                    </p>
+                    <p className="text-sm text-muted-foreground flex items-center gap-1 justify-end">
+                      <Clock className="h-3 w-3" />
+                      {getProjectHours(project)} timer
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {project.tasks.length} opgaver
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold">
-                    {getProjectTotal(project).toLocaleString('da-DK')} kr.
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {getProjectHours(project)} timer
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {project.tasks.length} opgaver
-                  </p>
+                <div className="flex gap-2 mt-4">
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/dashboard/projects/${project.id}`}>
+                      Se detaljer
+                    </Link>
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => openEditForm(project)}>
+                    <Pencil className="h-4 w-4 mr-1" />
+                    Rediger
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-destructive hover:text-destructive"
+                    onClick={() => handleDelete(project.id)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Slet
+                  </Button>
                 </div>
-              </div>
-              <div className="mt-3 flex gap-2">
-                <Link
-                  href={`/dashboard/projects/${project.id}`}
-                  className="px-3 py-1 text-sm border rounded hover:bg-gray-100"
-                >
-                  Se detaljer
-                </Link>
-                <button
-                  onClick={() => openEditForm(project)}
-                  className="px-3 py-1 text-sm border rounded hover:bg-gray-100"
-                >
-                  Rediger
-                </button>
-                <button
-                  onClick={() => handleDelete(project.id)}
-                  className="px-3 py-1 text-sm border border-red-300 text-red-600 rounded hover:bg-red-50"
-                >
-                  Slet
-                </button>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
+
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>
+              {editingProject ? 'Rediger projekt' : 'Nyt projekt'}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Navn</Label>
+              <Input
+                id="name"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="clientId">Kunde</Label>
+              <Select
+                value={formData.clientId}
+                onValueChange={(value) => setFormData({ ...formData, clientId: value })}
+                required
+              >
+                <SelectTrigger id="clientId">
+                  <SelectValue placeholder="Vælg kunde..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {clients.map((client) => (
+                    <SelectItem key={client.id} value={client.id}>
+                      {client.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="type">Type</Label>
+              <Select
+                value={formData.type}
+                onValueChange={(value) => setFormData({ ...formData, type: value })}
+              >
+                <SelectTrigger id="type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PROJECT">Projekt</SelectItem>
+                  <SelectItem value="SUPPORT">Support</SelectItem>
+                  <SelectItem value="RETAINER">Retainer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">Beskrivelse</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={closeForm}>
+                Annuller
+              </Button>
+              <Button type="submit">
+                {editingProject ? 'Gem ændringer' : 'Opret'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

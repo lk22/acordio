@@ -5,9 +5,13 @@ import Navigation from "./dashboard/Navigation";
 
 export default function Header() {
   return (
-    <header className="w-full h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-      <Logo width={200} />
-      <Navigation />
+    <header className="w-full border-b bg-card">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex h-14 items-center justify-between">
+          <Logo width={180} />
+          <Navigation />
+        </div>
+      </div>
     </header>
   );
 }

@@ -3,34 +3,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
 
-  const client = await prisma.client.findUnique({
+  const activityLog = await prisma.activityLog.findUnique({
     where: { id },
     include: {
-      projects: {
-        include: {
-          tasks: true,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      },
-      activityLogs: {
-        orderBy: {
-          createdAt: "desc",
-        },
-      },
+      client: true,
     },
   });
 
-  if (!client) {
+  if (!activityLog) {
     return NextResponse.json(
       {
-        message: "Client not found",
+        message: "Activity log not found",
         success: false,
       },
       { status: 404 }
@@ -39,8 +27,8 @@ export async function GET(
 
   return NextResponse.json(
     {
-      message: "Client found",
-      client,
+      message: "Activity log found",
+      activityLog,
       success: true,
     },
     { status: 200 }
@@ -52,26 +40,23 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const { name, email, phone, address, company, status, notes } =
-    await request.json();
+  const { type, description } = await request.json();
 
-  const updatedClient = await prisma.client.update({
+  const updatedActivityLog = await prisma.activityLog.update({
     where: { id },
     data: {
-      name,
-      email,
-      phone,
-      address,
-      company,
-      status,
-      notes,
+      type,
+      description,
+    },
+    include: {
+      client: true,
     },
   });
 
-  if (!updatedClient) {
+  if (!updatedActivityLog) {
     return NextResponse.json(
       {
-        message: "Failed to update client",
+        message: "Failed to update activity log",
         success: false,
       },
       { status: 500 }
@@ -80,8 +65,8 @@ export async function PUT(
 
   return NextResponse.json(
     {
-      message: "Client updated successfully",
-      client: updatedClient,
+      message: "Activity log updated successfully",
+      activityLog: updatedActivityLog,
       success: true,
     },
     { status: 200 }
@@ -89,19 +74,19 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
 
-  const deletedClient = await prisma.client.delete({
+  const deletedActivityLog = await prisma.activityLog.delete({
     where: { id },
   });
 
-  if (!deletedClient) {
+  if (!deletedActivityLog) {
     return NextResponse.json(
       {
-        message: "Failed to delete client",
+        message: "Failed to delete activity log",
         success: false,
       },
       { status: 500 }
@@ -110,7 +95,7 @@ export async function DELETE(
 
   return NextResponse.json(
     {
-      message: "Client deleted successfully",
+      message: "Activity log deleted successfully",
       success: true,
     },
     { status: 200 }
