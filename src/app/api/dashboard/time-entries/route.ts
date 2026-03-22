@@ -26,13 +26,14 @@ export async function GET(request: NextRequest) {
     },
   });
 
-  if (!timeEntries) {
+  if (!timeEntries || timeEntries.length === 0) {
     return NextResponse.json(
       {
         message: "No time entries found",
         success: false,
+        timeEntries: [],
       },
-      { status: 404 }
+      { status: 200 }
     );
   }
 
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const { taskId, hours, date, notes } = await request.json();
 
-  if (!taskId || !hours) {
+  if (!taskId || hours === undefined || hours === null) {
     return NextResponse.json(
       {
         message: "taskId and hours are required",
@@ -58,44 +59,46 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const newTimeEntry = await prisma.timeEntry.create({
-    data: {
-      taskId,
-      hours,
-      date: date || new Date(),
-      notes,
-    },
-    include: {
-      task: {
-        include: {
-          project: {
-            include: {
-              client: true,
+  try {
+    const newTimeEntry = await prisma.timeEntry.create({
+      data: {
+        taskId,
+        hours: parseFloat(hours),
+        date: date ? new Date(date) : new Date(),
+        notes: notes || null,
+      },
+      include: {
+        task: {
+          include: {
+            project: {
+              include: {
+                client: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  if (!newTimeEntry) {
+    return NextResponse.json(
+      {
+        message: "Time entry created successfully",
+        timeEntry: newTimeEntry,
+        success: true,
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('Error creating time entry:', error);
     return NextResponse.json(
       {
         message: "Failed to create time entry",
         success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );
   }
-
-  return NextResponse.json(
-    {
-      message: "Time entry created successfully",
-      timeEntry: newTimeEntry,
-      success: true,
-    },
-    { status: 201 }
-  );
 }
 
 export async function PUT(request: NextRequest) {

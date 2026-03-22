@@ -64,9 +64,9 @@ interface TimeEntryFormData {
 }
 
 const PROJECT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
-  PROJECT: { label: 'Projekt', color: 'bg-blue-100 text-blue-800' },
-  SUPPORT: { label: 'Support', color: 'bg-green-100 text-green-800' },
-  RETAINER: { label: 'Retainer', color: 'bg-purple-100 text-purple-800' },
+  PROJECT: { label: 'Projekt', color: 'bg-blue-100 text-blue-800 hover:bg-blue-200 hover:text-blue-900' },
+  SUPPORT: { label: 'Support', color: 'bg-green-100 text-green-800 hover:bg-green-200 hover:text-green-900' },
+  RETAINER: { label: 'Retainer', color: 'bg-purple-100 text-purple-800 hover:bg-purple-200 hover:text-purple-900' },
 };
 
 export default function ProjectDetailPage({
@@ -115,27 +115,36 @@ export default function ProjectDetailPage({
     }
   }, [projectId]);
 
-  const fetchTimeEntries = useCallback(async () => {
-    if (!projectId) return;
+  const fetchTimeEntries = useCallback(async (taskIds: string[]) => {
+    if (!projectId || taskIds.length === 0) {
+      setTimeEntries([]);
+      return;
+    }
     try {
       const res = await fetch(`/api/dashboard/time-entries`);
       const data = await res.json();
       if (data.timeEntries) {
         setTimeEntries(data.timeEntries.filter((te: TimeEntry) =>
-          project?.tasks.some(t => t.id === te.taskId)
+          taskIds.includes(te.taskId)
         ));
       }
     } catch (error) {
       console.error('Error fetching time entries:', error);
     }
-  }, [projectId, project]);
+  }, [projectId]);
 
   useEffect(() => {
     if (projectId) {
       fetchProject();
-      fetchTimeEntries();
     }
-  }, [projectId, fetchProject, fetchTimeEntries]);
+  }, [projectId, fetchProject]);
+
+  useEffect(() => {
+    if (project?.tasks) {
+      const taskIds = project.tasks.map(t => t.id);
+      fetchTimeEntries(taskIds);
+    }
+  }, [project, fetchTimeEntries]);
 
   function openCreateTaskForm() {
     setEditingTask(null);
@@ -249,7 +258,7 @@ export default function ProjectDetailPage({
       });
 
       if (res.ok) {
-        fetchTimeEntries();
+        fetchTimeEntries(project?.tasks.map(t => t.id) || []);
         closeTimeEntryForm();
       }
     } catch (error) {
@@ -266,7 +275,7 @@ export default function ProjectDetailPage({
       });
 
       if (res.ok) {
-        fetchTimeEntries();
+        fetchTimeEntries(project?.tasks.map(t => t.id) || []);
       }
     } catch (error) {
       console.error('Error deleting time entry:', error);
@@ -443,18 +452,18 @@ export default function ProjectDetailPage({
                   {getTaskTimeEntries(task.id).length > 0 && (
                     <div className="pl-4 border-l-2 border-muted space-y-1">
                       {getTaskTimeEntries(task.id).map((te) => (
-                        <div key={te.id} className="flex justify-between items-center text-xs">
+                        <div key={te.id} className="flex items-center gap-2 text-xs">
                           <span className="text-muted-foreground">
                             {new Date(te.date).toLocaleDateString('da-DK')} • {te.hours} timer
                             {te.notes && <span className="ml-1">({te.notes})</span>}
                           </span>
                           <Button
                             variant="ghost"
-                            size="icon"
-                            className="h-5 w-5"
+                            size="sm"
+                            className="h-5 px-1 text-muted-foreground hover:text-destructive"
                             onClick={() => handleDeleteTimeEntry(te.id)}
                           >
-                            <Trash2 className="h-3 w-3 text-destructive" />
+                            <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>
                       ))}

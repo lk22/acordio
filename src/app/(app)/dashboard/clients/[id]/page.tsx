@@ -63,9 +63,9 @@ const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secon
 };
 
 const PROJECT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
-  PROJECT: { label: 'Projekt', color: 'bg-blue-100 text-blue-800' },
-  SUPPORT: { label: 'Support', color: 'bg-green-100 text-green-800' },
-  RETAINER: { label: 'Retainer', color: 'bg-purple-100 text-purple-800' },
+  PROJECT: { label: 'Projekt', color: 'bg-blue-100 text-blue-800 hover:bg-blue-200 hover:text-blue-900' },
+  SUPPORT: { label: 'Support', color: 'bg-green-100 text-green-800 hover:bg-green-200 hover:text-green-900' },
+  RETAINER: { label: 'Retainer', color: 'bg-purple-100 text-purple-800 hover:bg-purple-200 hover:text-purple-900' },
 };
 
 const ACTIVITY_ICONS: Record<string, React.ElementType> = {
